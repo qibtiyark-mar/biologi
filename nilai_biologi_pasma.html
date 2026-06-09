@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nilai Biologi PASMA – Kelas X</title>
+<style>
+  :root {
+    --green-50:#EAF3DE;--green-100:#C0DD97;--green-400:#639922;--green-600:#3B6D11;--green-800:#27500A;
+    --teal-50:#E1F5EE;--teal-800:#085041;
+    --amber-50:#FAEEDA;--amber-600:#854F0B;--amber-800:#633806;
+    --red-50:#FCEBEB;--red-400:#E24B4A;--red-600:#A32D2D;--red-800:#791F1F;
+    --blue-50:#E6F1FB;--blue-600:#185FA5;--blue-800:#0C447C;
+    --gray-50:#F1EFE8;--gray-100:#D3D1C7;--gray-400:#888780;--gray-600:#5F5E5A;--gray-800:#444441;
+    --bg:#f7f6f2;--surface:#ffffff;--border:rgba(0,0,0,0.12);
+    --text:#1a1a18;--muted:#5F5E5A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  /* ── SCREENS ── */
+  .screen{display:none;min-height:100vh;}
+  .screen.active{display:flex;}
+
+  /* ── LOGIN SCREEN ── */
+  #screen-login{align-items:center;justify-content:center;padding:2rem;}
+  .login-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:380px;text-align:center;}
+  .brand-icon{width:56px;height:56px;border-radius:14px;background:var(--green-50);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;}
+  .brand-icon svg{width:28px;height:28px;stroke:var(--green-600);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .login-title{font-size:20px;font-weight:600;margin-bottom:4px;}
+  .login-sub{font-size:13px;color:var(--muted);margin-bottom:1.75rem;line-height:1.6;}
+  .field-label{font-size:12px;font-weight:500;color:var(--muted);text-align:left;display:block;margin-bottom:6px;}
+  .field-input{width:100%;padding:10px 14px;border:0.5px solid var(--border);border-radius:8px;font-size:15px;background:var(--bg);color:var(--text);outline:none;margin-bottom:14px;transition:border-color .15s;}
+  .field-input:focus{border-color:var(--green-400);}
+  .btn-primary{width:100%;padding:11px;border:none;border-radius:8px;font-size:15px;font-weight:500;background:var(--green-600);color:#fff;cursor:pointer;transition:background .15s;}
+  .btn-primary:hover{background:var(--green-800);}
+  .error-msg{font-size:13px;color:var(--red-600);margin-top:10px;display:none;}
+  .divider{border:none;border-top:0.5px solid var(--border);margin:1.5rem 0;}
+  .siswa-link{font-size:13px;color:var(--green-600);cursor:pointer;text-decoration:underline;}
+
+  /* ── DASHBOARD (guru) ── */
+  #screen-dashboard{flex-direction:column;}
+  .topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;gap:1rem;height:56px;position:sticky;top:0;z-index:10;}
+  .topbar-title{font-size:15px;font-weight:600;}
+  .topbar-sub{font-size:12px;color:var(--muted);}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .btn-outline{padding:6px 14px;border:0.5px solid var(--border);border-radius:8px;font-size:13px;background:transparent;color:var(--muted);cursor:pointer;}
+  .btn-outline:hover{background:var(--gray-50);}
+  .main{padding:1.5rem;max-width:1100px;margin:0 auto;}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.5rem;}
+  .metric-card{background:var(--surface);border:0.5px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .metric-label{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+  .metric-val{font-size:22px;font-weight:600;}
+  .metric-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+  .tab-bar{display:flex;gap:4px;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .tab{padding:7px 14px;border:0.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--muted);transition:all .15s;}
+  .tab:hover{background:var(--green-50);color:var(--green-600);border-color:var(--green-100);}
+  .tab.active{background:var(--green-600);color:#fff;border-color:var(--green-600);}
+  .section-title{font-size:15px;font-weight:600;margin-bottom:1rem;}
+  .classes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1rem;}
+  .class-mini-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;}
+  .class-mini-header{padding:12px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .class-mini-title{font-size:14px;font-weight:600;}
+  .class-avg{font-size:13px;font-weight:600;}
+  .class-avg.good{color:var(--green-600);}
+  .class-avg.ok{color:var(--amber-600);}
+  .class-avg.low{color:var(--red-600);}
+  .dist-bar-wrap{padding:12px 16px;}
+  .dist-label{font-size:11px;color:var(--muted);margin-bottom:6px;}
+  .dist-bar{display:flex;height:20px;border-radius:6px;overflow:hidden;gap:2px;}
+  .dist-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;min-width:4px;transition:width .4s;}
+  .dist-seg.a{background:var(--green-400);}
+  .dist-seg.b{background:#1D9E75;}
+  .dist-seg.c{background:#BA7517;}
+  .dist-seg.d{background:var(--red-400);}
+  .dist-legend{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;}
+  .dist-leg-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px;}
+  .dist-leg-dot{width:8px;height:8px;border-radius:2px;}
+  .chart-section{margin-top:1.5rem;background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;}
+  .bar-chart{display:flex;flex-direction:column;gap:8px;}
+  .bar-row{display:flex;align-items:center;gap:10px;}
+  .bar-label{font-size:12px;font-weight:500;width:54px;color:var(--muted);flex-shrink:0;}
+  .bar-outer{flex:1;height:24px;background:var(--gray-50);border-radius:6px;overflow:hidden;}
+  .bar-inner{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11px;font-weight:600;color:#fff;}
+
+  /* ── SISWA MODAL ── */
+  #screen-siswa{align-items:center;justify-content:center;padding:2rem;}
+  .siswa-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:420px;}
+  .back-btn{font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:1.5rem;display:inline-flex;align-items:center;gap:6px;}
+  .back-btn:hover{color:var(--text);}
+  .siswa-result{display:none;}
+  .result-header{text-align:center;padding:1.5rem 0 1rem;}
+  .result-name{font-size:18px;font-weight:600;margin-bottom:4px;}
+  .result-class{font-size:13px;color:var(--muted);}
+  .result-nilai{font-size:56px;font-weight:700;margin:1rem 0 0.25rem;line-height:1;}
+  .result-nilai.good{color:var(--green-600);}
+  .result-nilai.ok{color:var(--amber-600);}
+  .result-nilai.low{color:var(--red-600);}
+  .result-badge{display:inline-block;padding:3px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:1rem;}
+  .badge-A{background:var(--green-50);color:var(--green-800);}
+  .badge-B{background:var(--teal-50);color:var(--teal-800);}
+  .badge-C{background:var(--amber-50);color:var(--amber-800);}
+  .badge-D{background:var(--red-50);color:var(--red-800);}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:1rem;}
+  .detail-cell{background:var(--bg);border-radius:8px;padding:10px;text-align:center;}
+  .detail-val{font-size:18px;font-weight:600;}
+  .detail-val.green{color:var(--green-600);}
+  .detail-val.red{color:var(--red-600);}
+  .detail-val.gray{color:var(--gray-600);}
+  .detail-lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+  .rank-info{margin-top:1rem;padding:10px 14px;background:var(--blue-50);border-radius:8px;font-size:13px;color:var(--blue-800);text-align:center;}
+  .nilai-bar-bg{height:8px;background:var(--gray-100);border-radius:4px;overflow:hidden;margin:0.75rem 0 0.25rem;}
+  .nilai-bar-fill{height:100%;border-radius:4px;transition:width .6s;}
+  .note-msg{font-size:11px;color:var(--muted);text-align:center;margin-top:1.5rem;}
+</style>
+</head>
+<body>
+
+<!-- ── SCREEN 1: LOGIN GURU ── -->
+<div id="screen-login" class="screen active">
+  <div class="login-card">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 1 0 0 10A5 5 0 0 0 12 2zm0 12c-5.33 0-8 2.67-8 4v2h16v-2c0-1.33-2.67-4-8-4z"/></svg>
+    </div>
+    <div class="login-title">Nilai Biologi PASMA</div>
+    <div class="login-sub">Penilaian Pilihan Ganda · Kelas X<br>Login sebagai guru untuk akses penuh</div>
+    <label class="field-label" for="guru-pwd">Password Guru</label>
+    <input class="field-input" type="password" id="guru-pwd" placeholder="Masukkan password guru…">
+    <button class="btn-primary" onclick="loginGuru()">Masuk sebagai Guru</button>
+    <div class="error-msg" id="guru-error">Password salah.</div>
+    <hr class="divider">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Siswa? Lihat nilai Anda sendiri</div>
+    <button class="btn-primary" style="background:var(--blue-600)" onclick="goSiswa()">Cek Nilai Saya →</button>
+  </div>
+</div>
+
+<!-- ── SCREEN 2: DASHBOARD GURU ── -->
+<div id="screen-dashboard" class="screen">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">PASMA Biologi — Dashboard</div>
+      <div class="topbar-sub">Data keseluruhan · tanpa nama siswa</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-outline" onclick="logout()">Keluar</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="summary-grid" id="summary-grid"></div>
+    <div class="tab-bar" id="tab-bar"></div>
+    <div id="content-area"></div>
+    <div class="chart-section" id="chart-section"></div>
+  </div>
+</div>
+
+<!-- ── SCREEN 3: CEK NILAI SISWA ── -->
+<div id="screen-siswa" class="screen">
+  <div class="siswa-card">
+    <div class="back-btn" onclick="backToLogin()">← Kembali</div>
+    <div class="login-title" style="margin-bottom:4px">Cek Nilai Saya</div>
+    <div class="login-sub">Masukkan nomor absen Anda untuk melihat nilai biologi</div>
+
+    <label class="field-label">Kelas</label>
+    <select class="field-input" id="siswa-kelas">
+      <option value="">— Pilih kelas —</option>
+      <option>X A</option><option>X B</option><option>X C</option>
+      <option>X D</option><option>X E</option><option>X F</option>
+      <option>X G</option><option>X H</option><option>X R</option>
+    </select>
+
+    <label class="field-label">Nomor Absen</label>
+    <input class="field-input" type="text" id="siswa-absen" placeholder="Contoh: XA001 atau 001">
+    <button class="btn-primary" style="background:var(--blue-600)" onclick="cekNilai()">Lihat Nilai Saya</button>
+    <div class="error-msg" id="siswa-error">Nomor absen tidak ditemukan. Periksa kelas &amp; nomor absen Anda.</div>
+
+    <!-- RESULT -->
+    <div class="siswa-result" id="siswa-result">
+      <hr class="divider">
+      <div class="result-header">
+        <div class="result-class" id="res-class"></div>
+        <div class="result-name" id="res-name"></div>
+        <div id="res-nilai-wrap">
+          <div class="result-nilai" id="res-nilai"></div>
+          <div><span class="result-badge" id="res-badge"></span></div>
+        </div>
+        <div class="nilai-bar-bg"><div class="nilai-bar-fill" id="res-bar"></div></div>
+        <div style="font-size:11px;color:var(--muted)" id="res-bar-label"></div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-cell"><div class="detail-val green" id="res-benar"></div><div class="detail-lbl">Jawaban benar</div></div>
+        <div class="detail-cell"><div class="detail-val red" id="res-salah"></div><div class="detail-lbl">Jawaban salah</div></div>
+        <div class="detail-cell"><div class="detail-val gray" id="res-kosong"></div><div class="detail-lbl">Tidak dijawab</div></div>
+      </div>
+      <div class="rank-info" id="res-rank"></div>
+      <div class="note-msg">Data ini hanya bisa dilihat oleh Anda sendiri.<br>Hubungi guru untuk informasi lebih lanjut.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const GURU_PASSWORD = "pasmabiologi2024";
+
+const RAW = {
+  "X A":[
+    {no:1,nama:"Afelanis Mu'alim Hidayah",benar:16,salah:9,kosong:0,nilai:64},
+    {no:2,nama:"Ahmad Zaidan Raihan Surya",benar:20,salah:5,kosong:0,nilai:80},
+    {no:3,nama:"Aida Khansa Salsabila",benar:19,salah:6,kosong:0,nilai:76},
+    {no:4,nama:"Aisya Salsabila Hernanda",benar:18,salah:7,kosong:0,nilai:72},
+    {no:5,nama:"Aisyah As Syifa Raihana",benar:20,salah:5,kosong:0,nilai:80},
+    {no:6,nama:"Amanda Ahsani",benar:16,salah:9,kosong:0,nilai:64},
+    {no:7,nama:"Carissa Asha Maharani",benar:11,salah:14,kosong:0,nilai:44},
+    {no:8,nama:"Dzakwan Alseva",benar:21,salah:4,kosong:0,nilai:84},
+    {no:9,nama:"Fardan Alvaro Faza Abdillah",benar:21,salah:4,kosong:0,nilai:84},
+    {no:10,nama:"Feza Ari Cakrayudha",benar:19,salah:6,kosong:0,nilai:76},
+    {no:11,nama:"Hanifah Anjani Putri Qur'ani",benar:20,salah:5,kosong:0,nilai:80},
+    {no:12,nama:"Himmatuzzaheera Naylal Ulya",benar:16,salah:9,kosong:0,nilai:64},
+    {no:13,nama:"Kaisah Ayu Purnamasari",benar:18,salah:7,kosong:0,nilai:72},
+    {no:14,nama:"Kaniya Nur Sabrina",benar:15,salah:10,kosong:0,nilai:60},
+    {no:15,nama:"Khansa Tania Nirwasita",benar:19,salah:6,kosong:0,nilai:76},
+    {no:16,nama:"Luthfia Nur Zulfa",benar:19,salah:6,kosong:0,nilai:76},
+    {no:17,nama:"Maimunah Azzahra",benar:17,salah:8,kosong:0,nilai:68},
+    {no:18,nama:"Muchsin Fajar Ramadhani",benar:19,salah:6,kosong:0,nilai:76},
+    {no:19,nama:"Muhammad Aryasatya Tegar H.",benar:18,salah:7,kosong:0,nilai:72},
+    {no:20,nama:"Mutiara Alfi Zulaicha",benar:21,salah:4,kosong:0,nilai:84},
+    {no:21,nama:"Namira Yasmine Chaerrany",benar:14,salah:11,kosong:0,nilai:56},
+    {no:22,nama:"Nasywa Mahdiya Khansa",benar:20,salah:5,kosong:0,nilai:80},
+    {no:23,nama:"Nur Aida Fina Zahra",benar:16,salah:9,kosong:0,nilai:64},
+    {no:24,nama:"Nurnaafidilah Muqitah",benar:21,salah:4,kosong:0,nilai:84},
+    {no:25,nama:"Sabrina 'Izzatuz Zahry",benar:20,salah:5,kosong:0,nilai:80},
+    {no:26,nama:"Sajidan Naufal Shofwan An-Nuron",benar:20,salah:5,kosong:0,nilai:80},
+    {no:27,nama:"Samudra Ar-Ridho Heriyanto",benar:10,salah:15,kosong:0,nilai:40},
+    {no:28,nama:"Satria Haritya Faadhil",benar:11,salah:14,kosong:0,nilai:44},
+    {no:29,nama:"Syifa Aqilaa Fauziyyah",benar:17,salah:8,kosong:0,nilai:68},
+    {no:30,nama:"Ulinnuha Auliya Muthmainnah",benar:17,salah:8,kosong:0,nilai:68},
+  ],
+  "X B":[
+    {no:1,nama:"Abidah Hanin Nida",benar:15,salah:10,kosong:0,nilai:60},
+    {no:2,nama:"Aini Ulfatuzzahro",benar:12,salah:13,kosong:0,nilai:48},
+    {no:3,nama:"Anindya Sweta Rullyandy",benar:20,salah:5,kosong:0,nilai:80},
+    {no:4,nama:"Annisa Regina Putri",benar:21,salah:4,kosong:0,nilai:84},
+    {no:5,nama:"Arfina Kusuma Dewi",benar:19,salah:6,kosong:0,nilai:76},
+    {no:6,nama:"Arshavin Dzaky Satrya",benar:17,salah:8,kosong:0,nilai:68},
+    {no:7,nama:"Aurelia Mustika Sharon",benar:14,salah:11,kosong:0,nilai:56},
+    {no:8,nama:"Azka Nabiil Qutbi",benar:20,salah:5,kosong:0,nilai:80},
+    {no:9,nama:"Dzakiyah Nur Rahma",benar:20,salah:5,kosong:0,nilai:80},
+    {no:10,nama:"Fadhil Ibrahim",benar:13,salah:12,kosong:0,nilai:52},
+    {no:11,nama:"Ghefira Hatmanti Al-Maghfira",benar:19,salah:6,kosong:0,nilai:76},
+    {no:12,nama:"Izzata Dina Arhama Rachma",benar:16,salah:9,kosong:0,nilai:64},
+    {no:13,nama:"Keysa Ayudiningtyas",benar:21,salah:4,kosong:0,nilai:84},
+    {no:14,nama:"Muhammad Ayyasy Khoirunnas",benar:18,salah:7,kosong:0,nilai:72},
+    {no:15,nama:"Muhammad Dhial Apta",benar:12,salah:13,kosong:0,nilai:48},
+    {no:16,nama:"Nafhisa Thahara Ramadhani",benar:16,salah:9,kosong:0,nilai:64},
+    {no:17,nama:"Najida Farah Az-Zahra",benar:21,salah:4,kosong:0,nilai:84},
+    {no:18,nama:"Neziandra Alifian Zaidan",benar:20,salah:5,kosong:0,nilai:80},
+    {no:19,nama:"Nikeisha Amelia Suksesi",benar:20,salah:5,kosong:0,nilai:80},
+    {no:20,nama:"Raihan Ardhiansyah",benar:13,salah:12,kosong:0,nilai:52},
+    {no:21,nama:"Ridho Rahmadhani",benar:11,salah:14,kosong:0,nilai:44},
+    {no:22,nama:"Sania Azalia Nauvaliany",benar:18,salah:7,kosong:0,nilai:72},
+    {no:23,nama:"Syahida Shofwan",benar:14,salah:11,kosong:0,nilai:56},
+    {no:24,nama:"Tsabita Diva Cattleya Giri",benar:8,salah:17,kosong:0,nilai:32},
+    {no:25,nama:"Vania Nirwasita Maharani",benar:20,salah:5,kosong:0,nilai:80},
+    {no:26,nama:"Wedharing Rahima Putri Kayana",benar:15,salah:10,kosong:0,nilai:60},
+    {no:27,nama:"Yasmine Najwa Zaakia",benar:13,salah:12,kosong:0,nilai:52},
+    {no:28,nama:"Zaky Waly Prakoso",benar:6,salah:19,kosong:0,nilai:24},
+  ],
+  "X C":[
+    {no:1,nama:"Adilla Aljawza Rohima",benar:16,salah:9,kosong:0,nilai:64},
+    {no:2,nama:"Adzka Rifqy Subagyo",benar:19,salah:5,kosong:1,nilai:76},
+    {no:3,nama:"Agha Fahlavi",benar:15,salah:10,kosong:0,nilai:60},
+    {no:4,nama:"Ahmad Bardanujabbar Setiawan",benar:16,salah:9,kosong:0,nilai:64},
+    {no:5,nama:"Ahmad Ikramul Hafiz",benar:18,salah:7,kosong:0,nilai:72},
+    {no:6,nama:"Aisyah Nur Zahra Sunardi",benar:13,salah:12,kosong:0,nilai:52},
+    {no:7,nama:"Alifia Rizky Ramadhani",benar:16,salah:9,kosong:0,nilai:64},
+    {no:8,nama:"Ananda Roja' Nur Fadhil",benar:22,salah:3,kosong:0,nilai:88},
+    {no:9,nama:"Andin Cielo Hidayat",benar:11,salah:14,kosong:0,nilai:44},
+    {no:10,nama:"Aulia Rosyida Nasywa Putri",benar:13,salah:12,kosong:0,nilai:52},
+    {no:11,nama:"Azkana Mikhayla Fawnia Calya",benar:17,salah:8,kosong:0,nilai:68},
+    {no:12,nama:"Chalisa Rafeyfa Zahrani",benar:14,salah:11,kosong:0,nilai:56},
+    {no:13,nama:"Chumayro Alya Rughbata",benar:12,salah:13,kosong:0,nilai:48},
+    {no:14,nama:"Danishava Khalillah Putra Alika",benar:13,salah:12,kosong:0,nilai:52},
+    {no:15,nama:"Fakhira Rifqa Gasani",benar:18,salah:7,kosong:0,nilai:72},
+    {no:16,nama:"Fauzia Az Zahra",benar:16,salah:9,kosong:0,nilai:64},
+    {no:17,nama:"Fendiraka Arshavin",benar:14,salah:11,kosong:0,nilai:56},
+    {no:18,nama:"Gendhis Anjawani",benar:15,salah:10,kosong:0,nilai:60},
+    {no:19,nama:"Hana Pangestu Sekarlangit",benar:13,salah:12,kosong:0,nilai:52},
+    {no:20,nama:"Hanin Dhiya Putri",benar:22,salah:3,kosong:0,nilai:88},
+    {no:21,nama:"Hisanah Artanti Rafifah",benar:16,salah:9,kosong:0,nilai:64},
+    {no:22,nama:"M Rauf Safaraz",benar:17,salah:8,kosong:0,nilai:68},
+    {no:23,nama:"Muhammad Farel Al Ghifary",benar:15,salah:10,kosong:0,nilai:60},
+    {no:24,nama:"Muhammad Iqbal Azzahir",benar:15,salah:10,kosong:0,nilai:60},
+    {no:25,nama:"Nadiya Fitri Nuraini",benar:4,salah:21,kosong:0,nilai:16},
+    {no:26,nama:"Nawra Bilqiis Oktayusta",benar:18,salah:7,kosong:0,nilai:72},
+    {no:27,nama:"Pascal Aryasuta",benar:19,salah:6,kosong:0,nilai:76},
+    {no:28,nama:"Safira Bilqis Alkhansa",benar:20,salah:5,kosong:0,nilai:80},
+    {no:29,nama:"Vania Bella Qonita",benar:18,salah:7,kosong:0,nilai:72},
+    {no:30,nama:"Zahra Aulia Rahma",benar:11,salah:14,kosong:0,nilai:44},
+    {no:31,nama:"Zalfa Ayu Nariswari",benar:13,salah:12,kosong:0,nilai:52},
+    {no:32,nama:"Zalfa Najla Nur Prayitno",benar:17,salah:8,kosong:0,nilai:68},
+    {no:33,nama:"Zulfa Nadia Aldis",benar:16,salah:9,kosong:0,nilai:64},
+  ],
+  "X D":[
+    {no:1,nama:"Achava Javas Nararya",benar:14,salah:11,kosong:0,nilai:56},
+    {no:2,nama:"Ahmad Nuurus Sholichin",benar:20,salah:5,kosong:0,nilai:80},
+    {no:3,nama:"Aiyla Ramadhani",benar:15,salah:10,kosong:0,nilai:60},
+    {no:4,nama:"Alma Zahrah Hisymata",benar:20,salah:4,kosong:1,nilai:80},
+    {no:5,nama:"Almira Listuhayu Wardani",benar:21,salah:4,kosong:0,nilai:84},
+    {no:6,nama:"Anggita Khairunnisa",benar:21,salah:4,kosong:0,nilai:84},
+    {no:7,nama:"Asri Ayka Nafi'ah",benar:13,salah:12,kosong:0,nilai:52},
+    {no:8,nama:"Aza Fatihah Az-Zahra",benar:5,salah:20,kosong:0,nilai:20},
+    {no:9,nama:"Azka Daspino Septian Fidyatama",benar:20,salah:5,kosong:0,nilai:80},
+    {no:10,nama:"Dewi Farrah Syahida",benar:16,salah:9,kosong:0,nilai:64},
+    {no:11,nama:"Eshan Faeyza Dharmaputra",benar:20,salah:4,kosong:1,nilai:80},
+    {no:12,nama:"Evan Haarits Sasongko",benar:20,salah:5,kosong:0,nilai:80},
+    {no:13,nama:"Faezya Abhinaya Indisti",benar:12,salah:13,kosong:0,nilai:48},
+    {no:14,nama:"Fajar Mas Ramadhan",benar:19,salah:6,kosong:0,nilai:76},
+    {no:15,nama:"Jordan Irsyad Al Fauzy",benar:22,salah:3,kosong:0,nilai:88},
+    {no:16,nama:"Kanaya Mailina Maharani Sudjatmiko",benar:11,salah:14,kosong:0,nilai:44},
+    {no:17,nama:"Latifa Hanum",benar:18,salah:7,kosong:0,nilai:72},
+    {no:18,nama:"Mayasya Syekha Azalia",benar:19,salah:6,kosong:0,nilai:76},
+    {no:19,nama:"Mohammad Raffa Rizqullah Sigit",benar:21,salah:4,kosong:0,nilai:84},
+    {no:20,nama:"Muhammad Maulida Abim Kurnia",benar:13,salah:12,kosong:0,nilai:52},
+    {no:21,nama:"Muhammad Shidqi Al Fatih",benar:18,salah:7,kosong:0,nilai:72},
+    {no:22,nama:"Myiesha Radmila Pribadi",benar:21,salah:4,kosong:0,nilai:84},
+    {no:23,nama:"Naifah Sany Putri",benar:14,salah:11,kosong:0,nilai:56},
+    {no:24,nama:"Naila Abiyyah",benar:17,salah:8,kosong:0,nilai:68},
+    {no:25,nama:"Nazwa Aulia Rahmania",benar:12,salah:13,kosong:0,nilai:48},
+    {no:26,nama:"Novita Nisa Humaira",benar:15,salah:10,kosong:0,nilai:60},
+    {no:27,nama:"Rafifah Salsabila Putri Sekarsari",benar:21,salah:4,kosong:0,nilai:84},
+    {no:28,nama:"Ro'fah Zahrotun Nisa",benar:12,salah:13,kosong:0,nilai:48},
+    {no:29,nama:"Salsabila Rifka Khoirunnisa",benar:21,salah:4,kosong:0,nilai:84},
+    {no:30,nama:"Simdan Kentaro Minoru",benar:9,salah:16,kosong:0,nilai:36},
+    {no:31,nama:"Tia Defitayana",benar:13,salah:12,kosong:0,nilai:52},
+    {no:32,nama:"Zahra Aurellinnisa",benar:19,salah:6,kosong:0,nilai:76},
+  ],
+  "X E":[
+    {no:1,nama:"Achmad Fakhri Maulana",benar:17,salah:8,kosong:0,nilai:68},
+    {no:2,nama:"Alif Azra Abrar",benar:12,salah:13,kosong:0,nilai:48},
+    {no:3,nama:"Asha Ramadhani Putri Anwari",benar:21,salah:4,kosong:0,nilai:84},
+    {no:4,nama:"Atania Kayisa Rahma",benar:21,salah:4,kosong:0,nilai:84},
+    {no:5,nama:"Aufa Luthfi Zulfariyanto",benar:16,salah:9,kosong:0,nilai:64},
+    {no:6,nama:"Azzaida Qanitatul 'Athifah",benar:14,salah:11,kosong:0,nilai:56},
+    {no:7,nama:"Fajria Dini Safarini Renuat",benar:19,salah:6,kosong:0,nilai:76},
+    {no:8,nama:"Fathina Haniyah Zahida",benar:20,salah:5,kosong:0,nilai:80},
+    {no:9,nama:"Hanifah Nursyifa Ar Rasyidah",benar:11,salah:14,kosong:0,nilai:44},
+    {no:10,nama:"Hasna Humaira Zakkiyatullah",benar:17,salah:8,kosong:0,nilai:68},
+    {no:11,nama:"Indah Khairunnisa Dewi",benar:7,salah:18,kosong:0,nilai:28},
+    {no:12,nama:"Indi Salwa Zahrina",benar:22,salah:3,kosong:0,nilai:88},
+    {no:13,nama:"Kahla Najma Gita Kirana",benar:18,salah:7,kosong:0,nilai:72},
+    {no:14,nama:"Kalya Vidya Prasasya",benar:20,salah:5,kosong:0,nilai:80},
+    {no:15,nama:"Laili Jannah Al Maqwa",benar:18,salah:7,kosong:0,nilai:72},
+    {no:16,nama:"Lingga Habib Mahardika",benar:19,salah:4,kosong:2,nilai:76},
+    {no:17,nama:"Muhammad Syafiq Miftahul Huda",benar:21,salah:4,kosong:0,nilai:84},
+    {no:18,nama:"Nabila Zahra Iskandar",benar:13,salah:12,kosong:0,nilai:52},
+    {no:19,nama:"Naqib Ahyar Dhiaul Hassan",benar:22,salah:3,kosong:0,nilai:88},
+    {no:20,nama:"Naura Fatchiya Abdillah",benar:12,salah:13,kosong:0,nilai:48},
+    {no:21,nama:"Noor Hayatul Fauziyah",benar:21,salah:4,kosong:0,nilai:84},
+    {no:22,nama:"Rafi'un Naja Setiawan",benar:17,salah:8,kosong:0,nilai:68},
+    {no:23,nama:"Rafif Fadhiel Akma Yudiant",benar:22,salah:3,kosong:0,nilai:88},
+    {no:24,nama:"Rinanda Dwi Astika",benar:11,salah:14,kosong:0,nilai:44},
+    {no:25,nama:"Rizqi Alghifari Zaidan",benar:7,salah:18,kosong:0,nilai:28},
+    {no:26,nama:"Rose Sheila Harun Tungga Dewi",benar:22,salah:3,kosong:0,nilai:88},
+    {no:27,nama:"Shafa Kamila Zulfa",benar:5,salah:20,kosong:0,nilai:20},
+    {no:28,nama:"Shafa Khairunnisa",benar:11,salah:14,kosong:0,nilai:44},
+    {no:29,nama:"Sulchan Afnan Rosyadi",benar:9,salah:16,kosong:0,nilai:36},
+    {no:30,nama:"Tiara Arum Azzahra",benar:14,salah:11,kosong:0,nilai:56},
+    {no:31,nama:"Tsabit Fawwaz Ahmad",benar:20,salah:5,kosong:0,nilai:80},
+    {no:32,nama:"Zaidan Faidhurrahman Hanafiah",benar:18,salah:7,kosong:0,nilai:72},
+  ],
+  "X F":[
+    {no:1,nama:"Adrian Maulana Al Ghaffaar",benar:22,salah:3,kosong:0,nilai:88},
+    {no:2,nama:"Alifa Nareswari Nur Faizah",benar:17,salah:8,kosong:0,nilai:68},
+    {no:3,nama:"Anindya Lathifatul Kirani Basuki",benar:13,salah:12,kosong:0,nilai:52},
+    {no:4,nama:"Anisya Putri Haruni",benar:20,salah:5,kosong:0,nilai:80},
+    {no:5,nama:"Ashry Qinandira",benar:10,salah:15,kosong:0,nilai:40},
+    {no:6,nama:"Aulia Nuzulul Karim Isnardi",benar:20,salah:5,kosong:0,nilai:80},
+    {no:7,nama:"Ayudhya Salma Azzahra",benar:18,salah:7,kosong:0,nilai:72},
+    {no:8,nama:"Bagus Widagdo",benar:13,salah:12,kosong:0,nilai:52},
+    {no:9,nama:"Gusti Adib Ahmed Kafin",benar:10,salah:15,kosong:0,nilai:40},
+    {no:10,nama:"Isa Berlian Karim Anwar Benzema",benar:13,salah:12,kosong:0,nilai:52},
+    {no:11,nama:"Kiandra Adnan Samudra",benar:18,salah:7,kosong:0,nilai:72},
+    {no:12,nama:"Mahrus Dhiya Al Irsyad",benar:19,salah:6,kosong:0,nilai:76},
+    {no:13,nama:"Melysa Amila Shalihan",benar:15,salah:10,kosong:0,nilai:60},
+    {no:14,nama:"Moksarandu Nawa",benar:20,salah:5,kosong:0,nilai:80},
+    {no:15,nama:"Muflikhatul Azkia",benar:21,salah:4,kosong:0,nilai:84},
+    {no:16,nama:"Muhammad Alif Prananda",benar:16,salah:9,kosong:0,nilai:64},
+    {no:17,nama:"Nafeesa Ramadhania Bahrun",benar:9,salah:16,kosong:0,nilai:36},
+    {no:18,nama:"Nakeysha Elfaretta Zizi",benar:11,salah:14,kosong:0,nilai:44},
+    {no:19,nama:"Qonita Tafi Zahrah",benar:14,salah:11,kosong:0,nilai:56},
+    {no:20,nama:"Raahil Karima Ghina",benar:18,salah:7,kosong:0,nilai:72},
+    {no:21,nama:"Rafi Ahza Helmi",benar:8,salah:17,kosong:0,nilai:32},
+    {no:22,nama:"Roro Sekar",benar:13,salah:12,kosong:0,nilai:52},
+    {no:23,nama:"Syefina Ashfa Ashfiyaa'",benar:18,salah:7,kosong:0,nilai:72},
+    {no:24,nama:"Tsaltsa Ghina Afriza Hidayat",benar:15,salah:10,kosong:0,nilai:60},
+    {no:25,nama:"Wildan Jati Atmaja",benar:18,salah:7,kosong:0,nilai:72},
+    {no:26,nama:"Yervant Faeyza Bintang Prakosa",benar:10,salah:15,kosong:0,nilai:40},
+    {no:27,nama:"Zahra Ayu Novitasari",benar:15,salah:10,kosong:0,nilai:60},
+    {no:28,nama:"Zalfa Adelia Abyana",benar:9,salah:16,kosong:0,nilai:36},
+    {no:29,nama:"Zidan Azka Al Fairuz",benar:12,salah:13,kosong:0,nilai:48},
+    {no:30,nama:"Zivanya Letisya Nora Indraya",benar:13,salah:12,kosong:0,nilai:52},
+  ],
+  "X G":[
+    {no:1,nama:"Aisyah Arifah Arimbi",benar:21,salah:4,kosong:0,nilai:84},
+    {no:2,nama:"Al Mira Maheswari",benar:15,salah:10,kosong:0,nilai:60},
+    {no:3,nama:"Azizah Ghina Sausan",benar:13,salah:12,kosong:0,nilai:52},
+    {no:4,nama:"Bilqies Regita Dewi Nur Syafi'i",benar:12,salah:13,kosong:0,nilai:48},
+    {no:5,nama:"Dhiavepa Nararya Agnaputra",benar:13,salah:12,kosong:0,nilai:52},
+    {no:6,nama:"Dinda Olivia",benar:16,salah:9,kosong:0,nilai:64},
+    {no:7,nama:"Fachry Syauqi Fawwaz",benar:18,salah:7,kosong:0,nilai:72},
+    {no:8,nama:"Izuni Hakimi",benar:13,salah:12,kosong:0,nilai:52},
+    {no:9,nama:"Khaira Nuzha Nur Kamila",benar:19,salah:6,kosong:0,nilai:76},
+    {no:10,nama:"Khansa Khairunnisa",benar:12,salah:13,kosong:0,nilai:48},
+    {no:11,nama:"Khansa Sendang Arum Pinayungan",benar:16,salah:9,kosong:0,nilai:64},
+    {no:12,nama:"Kinar Keandra Maharani",benar:17,salah:8,kosong:0,nilai:68},
+    {no:13,nama:"M Bafadhal Danarahza",benar:13,salah:12,kosong:0,nilai:52},
+    {no:14,nama:"Makarim Wibisono",benar:5,salah:20,kosong:0,nilai:20},
+    {no:15,nama:"Muhammad Aruj Arasy Mulya",benar:15,salah:10,kosong:0,nilai:60},
+    {no:16,nama:"Muhammad Dzulkarnaen Hasan",benar:13,salah:12,kosong:0,nilai:52},
+    {no:17,nama:"Muhammad Fauzan Hafidz Wicaksono",benar:16,salah:9,kosong:0,nilai:64},
+    {no:18,nama:"Muhammad Yusuf Damara",benar:23,salah:2,kosong:0,nilai:92},
+    {no:19,nama:"Muhammad Zuhan Yasavie",benar:15,salah:10,kosong:0,nilai:60},
+    {no:20,nama:"Nabila Nikmah Aziza",benar:17,salah:8,kosong:0,nilai:68},
+    {no:21,nama:"Nada Nabila Shaffa",benar:17,salah:8,kosong:0,nilai:68},
+    {no:22,nama:"Nasywa Aisy Rosyada",benar:null,salah:null,kosong:null,nilai:null},
+    {no:23,nama:"Naufa",benar:16,salah:9,kosong:0,nilai:64},
+    {no:24,nama:"Navisa Mulia Ariani",benar:10,salah:15,kosong:0,nilai:40},
+    {no:25,nama:"Nurul Najma Kartika",benar:14,salah:11,kosong:0,nilai:56},
+    {no:26,nama:"Rahma Muflihatus Tsaniyyah",benar:12,salah:13,kosong:0,nilai:48},
+    {no:27,nama:"Rashif Azka Mu'tashim",benar:21,salah:4,kosong:0,nilai:84},
+    {no:28,nama:"Saffana Muflihah Bahij",benar:19,salah:6,kosong:0,nilai:76},
+    {no:29,nama:"Saskia Damara Putri",benar:6,salah:19,kosong:0,nilai:24},
+    {no:30,nama:"Zahwa Apriliyanti Krisda",benar:10,salah:15,kosong:0,nilai:40},
+    {no:31,nama:"Zhafira Farannisa Maheswari",benar:9,salah:16,kosong:0,nilai:36},
+    {no:32,nama:"Zulfa Fadliyah",benar:18,salah:7,kosong:0,nilai:72},
+    {no:33,nama:"Zulhilmi Fadhirrahman",benar:16,salah:9,kosong:0,nilai:64},
+  ],
+  "X H":[
+    {no:1,nama:"Aindamara Farraas El Taqiy",benar:5,salah:20,kosong:0,nilai:20},
+    {no:2,nama:"Aisara Lakshita Putri",benar:12,salah:13,kosong:0,nilai:48},
+    {no:3,nama:"Alya Ahza Nadifa",benar:9,salah:16,kosong:0,nilai:36},
+    {no:4,nama:"Anindita Kirania Ismun",benar:8,salah:17,kosong:0,nilai:32},
+    {no:5,nama:"Arkan Abhista Djuliano",benar:9,salah:16,kosong:0,nilai:36},
+    {no:6,nama:"Ayesha Khaira Puteri",benar:7,salah:18,kosong:0,nilai:28},
+    {no:7,nama:"Dini Maulida Shalikhah",benar:18,salah:7,kosong:0,nilai:72},
+    {no:8,nama:"Fadillah Kaylanisa Masrukhan",benar:10,salah:15,kosong:0,nilai:40},
+    {no:9,nama:"Febri Tri Wahyuni",benar:8,salah:17,kosong:0,nilai:32},
+    {no:10,nama:"Ghozza Ma Aghrasetra",benar:19,salah:6,kosong:0,nilai:76},
+    {no:11,nama:"Hafizh Saifurrahman",benar:6,salah:19,kosong:0,nilai:24},
+    {no:12,nama:"Hanum Khalisa Fasya",benar:18,salah:7,kosong:0,nilai:72},
+    {no:13,nama:"Kalila Zahra Khairun Nisa'",benar:12,salah:13,kosong:0,nilai:48},
+    {no:14,nama:"Kallista Zahra Muharomi Mahfudzah",benar:8,salah:17,kosong:0,nilai:32},
+    {no:15,nama:"Lantar Ramadhan",benar:10,salah:15,kosong:0,nilai:40},
+    {no:16,nama:"M. Farhan Alghifari",benar:12,salah:13,kosong:0,nilai:48},
+    {no:17,nama:"Muhammad Azhar Firas",benar:7,salah:18,kosong:0,nilai:28},
+    {no:18,nama:"Muhammad Ihsan Kusdinantoro",benar:20,salah:5,kosong:0,nilai:80},
+    {no:19,nama:"Muhammad Nur Aiman Bukhori",benar:6,salah:19,kosong:0,nilai:24},
+    {no:20,nama:"Muhammad Syarief Imaduddin",benar:12,salah:13,kosong:0,nilai:48},
+    {no:21,nama:"Nasyifa Ainun Rohma",benar:11,salah:14,kosong:0,nilai:44},
+    {no:22,nama:"Nasywa Putri Zahrani",benar:8,salah:17,kosong:0,nilai:32},
+    {no:23,nama:"Rahil Zuhrotul Mawaddah",benar:14,salah:11,kosong:0,nilai:56},
+    {no:24,nama:"Revalana Dyaning Pribadi",benar:13,salah:12,kosong:0,nilai:52},
+    {no:25,nama:"Sabiq Ahmad",benar:9,salah:16,kosong:0,nilai:36},
+    {no:26,nama:"Sekar Isty Paramitha Nugroho",benar:20,salah:5,kosong:0,nilai:80},
+    {no:27,nama:"Selima Dartya Cahya Piliang",benar:9,salah:16,kosong:0,nilai:36},
+    {no:28,nama:"Suci Syarifah",benar:20,salah:5,kosong:0,nilai:80},
+    {no:29,nama:"Syifa Aufia",benar:18,salah:7,kosong:0,nilai:72},
+    {no:30,nama:"Wiraka Satria Ali Yafi",benar:19,salah:6,kosong:0,nilai:76},
+  ],
+  "X R":[
+    {no:1,nama:"Adel Khoirunnisa Annafi",benar:19,salah:6,kosong:0,nilai:76},
+    {no:2,nama:"Adlina Ariska Layanatussifa",benar:16,salah:8,kosong:1,nilai:64},
+    {no:3,nama:"Adzkiya Afny Afifatunnisa",benar:17,salah:8,kosong:0,nilai:68},
+    {no:4,nama:"Ahmad Sahal Mahfudz Arroqiy",benar:18,salah:7,kosong:0,nilai:72},
+    {no:5,nama:"Ainun Mahya Luthfia",benar:16,salah:9,kosong:0,nilai:64},
+    {no:6,nama:"Alvino Listiawan Putra",benar:15,salah:10,kosong:0,nilai:60},
+    {no:7,nama:"Amira Nur Hasanah",benar:13,salah:12,kosong:0,nilai:52},
+    {no:8,nama:"Divany Sekar Ayu Nirbita Amri",benar:20,salah:5,kosong:0,nilai:80},
+    {no:9,nama:"Farah Hilda Efendi",benar:7,salah:18,kosong:0,nilai:28},
+    {no:10,nama:"Fida' Mazaya",benar:13,salah:12,kosong:0,nilai:52},
+    {no:11,nama:"Fisabilla Dhiya Azzahra",benar:17,salah:8,kosong:0,nilai:68},
+    {no:12,nama:"Fitri Khairunnisa",benar:20,salah:5,kosong:0,nilai:80},
+    {no:13,nama:"Galang Persada",benar:18,salah:7,kosong:0,nilai:72},
+    {no:14,nama:"Gendhis Azka Khumaira",benar:20,salah:5,kosong:0,nilai:80},
+    {no:15,nama:"Gissela Gita Larassati",benar:14,salah:11,kosong:0,nilai:56},
+    {no:16,nama:"Hamzah Luthfan Muzakki",benar:15,salah:10,kosong:0,nilai:60},
+    {no:17,nama:"Hanifah Hasnal Humairo",benar:18,salah:7,kosong:0,nilai:72},
+    {no:18,nama:"Hilmy Fatah Dwi Kurniawan",benar:19,salah:6,kosong:0,nilai:76},
+    {no:19,nama:"Ina Nur Setyaningsih",benar:18,salah:7,kosong:0,nilai:72},
+    {no:20,nama:"Jaris Habib Ar-Rayyan",benar:12,salah:13,kosong:0,nilai:48},
+    {no:21,nama:"Lutfyah Khoerunisa Putri",benar:18,salah:7,kosong:0,nilai:72},
+    {no:22,nama:"Luthfiana Fadlika",benar:19,salah:6,kosong:0,nilai:76},
+    {no:23,nama:"Malka Syarif Khalid",benar:12,salah:13,kosong:0,nilai:48},
+    {no:24,nama:"Maydah Farodis",benar:20,salah:5,kosong:0,nilai:80},
+    {no:25,nama:"Muhammad Ikhwan Nabil",benar:16,salah:9,kosong:0,nilai:64},
+    {no:26,nama:"Muhammad Nurilfajri",benar:20,salah:5,kosong:0,nilai:80},
+    {no:27,nama:"Nadesthan Rakha' Izzanudin Nafi'",benar:7,salah:18,kosong:0,nilai:28},
+    {no:28,nama:"Taqiya Mazaya Silmi",benar:18,salah:7,kosong:0,nilai:72},
+    {no:29,nama:"Vella Syari'at Puspitasari",benar:17,salah:8,kosong:0,nilai:68},
+    {no:30,nama:"Zahida Khairunnisa Al Humaira",benar:13,salah:12,kosong:0,nilai:52},
+    {no:31,nama:"Zidni Sa'diyah Nikmah",benar:21,salah:4,kosong:0,nilai:84},
+    {no:32,nama:"Zulfa Avail Hanafi",benar:17,salah:8,kosong:0,nilai:68},
+  ],
+};
+
+// ── helpers ─────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function parseAbsen(kls, raw) {
+  const s = raw.trim();
+  // accept formats: 001, 1, XA001, XA1, xa001 etc.
+  const prefix = kls.replace(' ','').toUpperCase(); // e.g. XA
+  let num;
+  const stripped = s.toUpperCase().replace(prefix,'');
+  num = parseInt(stripped, 10);
+  if (isNaN(num)) num = parseInt(s, 10);
+  return num;
+}
+
+function getGrade(v) {
+  if (v === null) return {label:'–', cls:''};
+  if (v >= 80) return {label:'A', cls:'badge-A'};
+  if (v >= 65) return {label:'B', cls:'badge-B'};
+  if (v >= 50) return {label:'C', cls:'badge-C'};
+  return {label:'D', cls:'badge-D'};
+}
+
+function classStats(kls) {
+  const vals = RAW[kls].filter(s => s.nilai !== null).map(s => s.nilai);
+  const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const dist = {A:0,B:0,C:0,D:0};
+  vals.forEach(v=>{ if(v>=80)dist.A++; else if(v>=65)dist.B++; else if(v>=50)dist.C++; else dist.D++; });
+  return { avg:avg.toFixed(1), max:Math.max(...vals), min:Math.min(...vals), count:RAW[kls].length, vals, dist };
+}
+
+// ── GURU LOGIN ───────────────────────────────────────────
+function loginGuru() {
+  const v = document.getElementById('guru-pwd').value;
+  const err = document.getElementById('guru-error');
+  if (v === GURU_PASSWORD) {
+    err.style.display = 'none';
+    showScreen('screen-dashboard');
+    initDashboard();
+  } else {
+    err.style.display = 'block';
+    document.getElementById('guru-pwd').value = '';
+  }
+}
+document.getElementById('guru-pwd').addEventListener('keydown', e => { if(e.key==='Enter') loginGuru(); });
+
+function logout() {
+  document.getElementById('guru-pwd').value = '';
+  showScreen('screen-login');
+}
+
+// ── SISWA FLOW ───────────────────────────────────────────
+function goSiswa() { showScreen('screen-siswa'); resetSiswa(); }
+function backToLogin() { showScreen('screen-login'); }
+
+function resetSiswa() {
+  document.getElementById('siswa-kelas').value = '';
+  document.getElementById('siswa-absen').value = '';
+  document.getElementById('siswa-error').style.display = 'none';
+  document.getElementById('siswa-result').style.display = 'none';
+}
+
+function cekNilai() {
+  const kls = document.getElementById('siswa-kelas').value;
+  const absenRaw = document.getElementById('siswa-absen').value;
+  const err = document.getElementById('siswa-error');
+  const res = document.getElementById('siswa-result');
+
+  err.style.display = 'none';
+  res.style.display = 'none';
+
+  if (!kls) { err.textContent = 'Pilih kelas terlebih dahulu.'; err.style.display = 'block'; return; }
+  if (!absenRaw.trim()) { err.textContent = 'Masukkan nomor absen.'; err.style.display = 'block'; return; }
+
+  const num = parseAbsen(kls, absenRaw);
+  const siswa = RAW[kls].find(s => s.no === num);
+
+  if (!siswa) { err.textContent = 'Nomor absen tidak ditemukan. Periksa kelas & nomor absen Anda.'; err.style.display = 'block'; return; }
+
+  // render result
+  const g = getGrade(siswa.nilai);
+  const st = classStats(kls);
+  const valsOnly = st.vals;
+  const rank = siswa.nilai !== null ? valsOnly.filter(v=>v>siswa.nilai).length + 1 : null;
+
+  const nilaiNum = siswa.nilai ?? 0;
+  const nilaiCls = nilaiNum >= 70 ? 'good' : nilaiNum >= 50 ? 'ok' : 'low';
+  const barColor = nilaiNum >= 70 ? '#3B6D11' : nilaiNum >= 50 ? '#854F0B' : '#A32D2D';
+
+  document.getElementById('res-class').textContent = `Kelas ${kls}`;
+  document.getElementById('res-name').textContent = siswa.nama;
+  document.getElementById('res-nilai').textContent = siswa.nilai ?? '–';
+  document.getElementById('res-nilai').className = `result-nilai ${nilaiCls}`;
+  const badge = document.getElementById('res-badge');
+  badge.textContent = `Predikat ${g.label}`;
+  badge.className = `result-badge ${g.cls}`;
+  document.getElementById('res-benar').textContent = siswa.benar ?? '–';
+  document.getElementById('res-salah').textContent = siswa.salah ?? '–';
+  document.getElementById('res-kosong').textContent = siswa.kosong ?? '–';
+  const bar = document.getElementById('res-bar');
+  bar.style.width = (siswa.nilai ?? 0) + '%';
+  bar.style.background = barColor;
+  document.getElementById('res-bar-label').textContent = `Nilai ${siswa.nilai ?? '–'} dari 100 · Rata-rata kelas: ${st.avg}`;
+  document.getElementById('res-rank').textContent = rank
+    ? `Peringkat ${rank} dari ${valsOnly.length} siswa di kelas ${kls}`
+    : 'Data nilai belum tersedia';
+
+  res.style.display = 'block';
+}
+document.getElementById('siswa-absen').addEventListener('keydown', e => { if(e.key==='Enter') cekNilai(); });
+
+// ── DASHBOARD GURU ───────────────────────────────────────
+let activeTab = 'ALL';
+
+function initDashboard() {
+  renderSummary();
+  renderTabs();
+  renderContent();
+  renderChart();
+}
+
+function renderSummary() {
+  const all = Object.values(RAW).flat().filter(s=>s.nilai!==null).map(s=>s.nilai);
+  const avg = (all.reduce((a,b)=>a+b,0)/all.length).toFixed(1);
+  document.getElementById('summary-grid').innerHTML = `
+    <div class="metric-card"><div class="metric-label">Total Siswa</div><div class="metric-val">${Object.values(RAW).flat().length}</div><div class="metric-sub">9 kelas</div></div>
+    <div class="metric-card"><div class="metric-label">Rata-rata Umum</div><div class="metric-val">${avg}</div><div class="metric-sub">dari 100</div></div>
+    <div class="metric-card"><div class="metric-label">Nilai Tertinggi</div><div class="metric-val">${Math.max(...all)}</div><div class="metric-sub">Kelas X G</div></div>
+    <div class="metric-card"><div class="metric-label">Nilai Terendah</div><div class="metric-val">${Math.min(...all)}</div><div class="metric-sub">Kelas X C</div></div>
+  `;
+}
+
+function renderTabs() {
+  let h = `<button class="tab ${activeTab==='ALL'?'active':''}" onclick="setTab('ALL')">Semua Kelas</button>`;
+  Object.keys(RAW).forEach(k => {
+    h += `<button class="tab ${activeTab===k?'active':''}" onclick="setTab('${k}')">${k}</button>`;
+  });
+  document.getElementById('tab-bar').innerHTML = h;
+}
+
+function setTab(t) { activeTab = t; renderTabs(); renderContent(); renderChart(); }
+
+function renderContent() {
+  const el = document.getElementById('content-area');
+  if (activeTab === 'ALL') {
+    let h = '<div class="classes-grid">';
+    Object.entries(RAW).forEach(([kls, data]) => {
+      const st = classStats(kls);
+      const avgN = parseFloat(st.avg);
+      const avgCls = avgN>=70?'good':avgN>=55?'ok':'low';
+      const tot = st.vals.length;
+      const pA = ((st.dist.A/tot)*100).toFixed(0);
+      const pB = ((st.dist.B/tot)*100).toFixed(0);
+      const pC = ((st.dist.C/tot)*100).toFixed(0);
+      const pD = ((st.dist.D/tot)*100).toFixed(0);
+      h += `<div class="class-mini-card">
+        <div class="class-mini-header">
+          <div>
+            <div class="class-mini-title">${kls}</div>
+            <div style="font-size:11px;color:var(--muted)">${st.count} siswa · ${st.min}–${st.max}</div>
+          </div>
+          <div class="class-avg ${avgCls}">⌀ ${st.avg}</div>
+        </div>
+        <div class="dist-bar-wrap">
+          <div class="dist-label">Distribusi predikat</div>
+          <div class="dist-bar">
+            ${pA>0?`<div class="dist-seg a" style="width:${pA}%">${pA>8?pA+'%':''}</div>`:''}
+            ${pB>0?`<div class="dist-seg b" style="width:${pB}%">${pB>8?pB+'%':''}</div>`:''}
+            ${pC>0?`<div class="dist-seg c" style="width:${pC}%">${pC>8?pC+'%':''}</div>`:''}
+            ${pD>0?`<div class="dist-seg d" style="width:${pD}%">${pD>8?pD+'%':''}</div>`:''}
+          </div>
+          <div class="dist-legend">
+            <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#639922"></span>A (≥80): ${st.dist.A}</span>
+            <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#1D9E75"></span>B (65–79): ${st.dist.B}</span>
+            <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#BA7517"></span>C (50–64): ${st.dist.C}</span>
+            <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#E24B4A"></span>D (<50): ${st.dist.D}</span>
+          </div>
+        </div>
+        <div style="padding:0 16px 12px">
+          <button onclick="setTab('${kls}')" style="border:0.5px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;background:transparent;color:var(--green-600);width:100%">Detail kelas →</button>
+        </div>
+      </div>`;
+    });
+    h += '</div>';
+    el.innerHTML = h;
+    return;
+  }
+
+  // Single class — stats only, NO names
+  const st = classStats(activeTab);
+  const tot = st.vals.length;
+  const pA = ((st.dist.A/tot)*100).toFixed(0);
+  const pB = ((st.dist.B/tot)*100).toFixed(0);
+  const pC = ((st.dist.C/tot)*100).toFixed(0);
+  const pD = ((st.dist.D/tot)*100).toFixed(0);
+
+  // distribution histogram (by range)
+  const ranges = [{l:0,r:19,lbl:'0–19'},{l:20,r:39,lbl:'20–39'},{l:40,r:59,lbl:'40–59'},{l:60,r:79,lbl:'60–79'},{l:80,r:100,lbl:'80–100'}];
+  const maxBin = Math.max(...ranges.map(r=>st.vals.filter(v=>v>=r.l&&v<=r.r).length));
+  const histRows = ranges.map(r => {
+    const cnt = st.vals.filter(v=>v>=r.l&&v<=r.r).length;
+    const pct = maxBin ? (cnt/maxBin*100).toFixed(0) : 0;
+    const col = r.l>=80?'#3B6D11':r.l>=60?'#1D9E75':r.l>=40?'#BA7517':'#E24B4A';
+    return `<div class="bar-row">
+      <span class="bar-label">${r.lbl}</span>
+      <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${col}">${cnt>0?cnt+' siswa':''}</div></div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;">
+    <div style="font-size:15px;font-weight:600;margin-bottom:1rem;">Statistik Kelas ${activeTab}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:1.25rem;">
+      <div class="metric-card"><div class="metric-label">Rata-rata</div><div class="metric-val" style="color:var(--green-600)">${st.avg}</div></div>
+      <div class="metric-card"><div class="metric-label">Tertinggi</div><div class="metric-val" style="color:var(--blue-600)">${st.max}</div></div>
+      <div class="metric-card"><div class="metric-label">Terendah</div><div class="metric-val" style="color:var(--red-600)">${st.min}</div></div>
+      <div class="metric-card"><div class="metric-label">Jumlah Siswa</div><div class="metric-val">${st.count}</div></div>
+    </div>
+    <div style="font-size:13px;font-weight:500;margin-bottom:8px;color:var(--muted)">Distribusi predikat</div>
+    <div class="dist-bar" style="height:28px;margin-bottom:8px;">
+      ${pA>0?`<div class="dist-seg a" style="width:${pA}%">${pA}%</div>`:''}
+      ${pB>0?`<div class="dist-seg b" style="width:${pB}%">${pB}%</div>`:''}
+      ${pC>0?`<div class="dist-seg c" style="width:${pC}%">${pC}%</div>`:''}
+      ${pD>0?`<div class="dist-seg d" style="width:${pD}%">${pD}%</div>`:''}
+    </div>
+    <div class="dist-legend" style="margin-bottom:1.25rem;">
+      <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#639922"></span>A (≥80): ${st.dist.A} siswa</span>
+      <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#1D9E75"></span>B (65–79): ${st.dist.B} siswa</span>
+      <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#BA7517"></span>C (50–64): ${st.dist.C} siswa</span>
+      <span class="dist-leg-item"><span class="dist-leg-dot" style="background:#E24B4A"></span>D (<50): ${st.dist.D} siswa</span>
+    </div>
+    <div style="font-size:13px;font-weight:500;margin-bottom:10px;color:var(--muted)">Distribusi nilai (histogram)</div>
+    <div class="bar-chart">${histRows}</div>
+  </div>`;
+}
+
+function renderChart() {
+  const entries = Object.entries(RAW).map(([kls,data])=>{
+    const vals = data.filter(s=>s.nilai!==null).map(s=>s.nilai);
+    return {kls, avg:vals.reduce((a,b)=>a+b,0)/vals.length};
+  }).sort((a,b)=>b.avg-a.avg);
+  const maxAvg = Math.max(...entries.map(e=>e.avg));
+  const rows = entries.map(e=>{
+    const pct = (e.avg/maxAvg*100).toFixed(1);
+    const col = e.avg>=70?'#3B6D11':e.avg>=55?'#854F0B':'#A32D2D';
+    const bold = activeTab===e.kls?'font-weight:700;':'';
+    return `<div class="bar-row">
+      <span class="bar-label" style="${bold}">${e.kls}</span>
+      <div class="bar-outer"><div class="bar-inner" style="width:${pct}%;background:${col}">${e.avg.toFixed(1)}</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('chart-section').innerHTML = `
+    <div class="section-title">Perbandingan Rata-rata Nilai per Kelas</div>
+    <div class="bar-chart">${rows}</div>
+    <div style="display:flex;gap:16px;margin-top:12px;font-size:11px;color:var(--muted);">
+      <span>🟢 ≥70 Baik</span><span>🟡 55–70 Cukup</span><span>🔴 &lt;55 Perlu perhatian</span>
+    </div>`;
+}
+</script>
+</body>
+</html>
